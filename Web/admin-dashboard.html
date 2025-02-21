@@ -32,12 +32,17 @@
     </form>
 
     <!-- Lista de usuarios -->
-    <h2>Usuarios Registrados</h2>
+    <h2>Administrar Usuarios</h2>
     <ul id="user-list"></ul>
 
     <button id="logout">Cerrar Sesión</button>
 
     <div id="message-container"></div>
+
+    <div id="message-container"></div>
+    <h2>Eliminar Cuenta</h2>
+    <button id="delete-account-btn">Eliminar mi cuenta</button>
+    
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -151,6 +156,25 @@
 
             setTimeout(() => messageDiv.remove(), 3000);
         }
+
+
+// Eliminar cuenta
+document.getElementById("delete-account-btn").addEventListener("click", function() {
+    const loggedUser = JSON.parse(localStorage.getItem("loggedUser"));
+  
+    if (loggedUser) {
+      if (confirm(`¿Estás seguro de que quieres eliminar tu cuenta, ${loggedUser.name}? Esta acción no se puede deshacer.`)) {
+        let users = JSON.parse(localStorage.getItem("users"));
+        users = users.filter(user => user.email!== loggedUser.email);
+        localStorage.setItem("users", JSON.stringify(users));
+        localStorage.removeItem("loggedUser");
+        window.location.href = "index.html";
+      }
+    }
+  });
+  
+
+
     </script>
 
 </body>
