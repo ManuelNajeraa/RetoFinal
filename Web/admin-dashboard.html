@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <link rel="stylesheet" href="Style.css">
+</head>
+<body>
+
+    <h1>Panel de Administración</h1>
+
+    <!-- Formulario para agregar un nuevo usuario -->
+    <h2>Agregar Nuevo Usuario</h2>
+    <form id="add-user-form">
+        <label for="new-name">Nombre:</label>
+        <input type="text" id="new-name" required>
+
+        <label for="new-email">Correo Electrónico:</label>
+        <input type="email" id="new-email" required>
+
+        <label for="new-password">Contraseña:</label>
+        <input type="password" id="new-password" required>
+
+        <label for="new-role">Rol:</label>
+        <select id="new-role">
+            <option value="user">Usuario Regular</option>
+            <option value="admin">Administrador</option>
+        </select>
+
+        <button type="submit">Agregar Usuario</button>
+    </form>
+
+    <!-- Lista de usuarios -->
+    <h2>Usuarios Registrados</h2>
+    <ul id="user-list"></ul>
+
+    <button id="logout">Cerrar Sesión</button>
+
+    <div id="message-container"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            updateUserList();
+        });
+
+        document.getElementById("add-user-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById("new-name").value;
+            const email = document.getElementById("new-email").value;
+            const password = document.getElementById("new-password").value;
+            const role = document.getElementById("new-role").value;
+
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+
+            // Verificar si el usuario ya existe
+            if (users.some(user => user.email === email)) {
+                alert("Este correo ya está registrado.");
+                return;
+            }
+
+            const newUser = { name, email, password, role };
+            users.push(newUser);
+            localStorage.setItem("users", JSON.stringify(users));
+
+            alert("Usuario agregado correctamente.");
+            updateUserList();
+            document.getElementById("add-user-form").reset();
+        });
+
+        function updateUserList() {
+            const users = JSON.parse(localStorage.getItem("users")) || [];
+            const userList = document.getElementById("user-list");
+            userList.innerHTML = "";
+
+            users.forEach(user => {
+                const li = document.createElement("li");
+                li.textContent = `${user.name} - ${user.email} (${user.role})`;
+
+                // Botón para editar usuario
+                const editBtn = document.createElement("button");
+                editBtn.textContent = "Editar";
+                editBtn.style.marginLeft = "10px";
+                editBtn.onclick = () => editUser(user.email);
+
+                // Botón para eliminar usuario
+                const deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "Eliminar";
+                deleteBtn.style.marginLeft = "10px";
+                deleteBtn.onclick = () => deleteUser(user.email);
+
+                li.appendChild(editBtn);
+                li.appendChild(deleteBtn);
+                userList.appendChild(li);
+            });
+        }
+
+        function deleteUser(email) {
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+            users = users.filter(user => user.email !== email);
+            localStorage.setItem("users", JSON.stringify(users));
+
+            alert("Usuario eliminado correctamente.");
+            updateUserList();
+        }
+
+        function editUser(email) {
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+            let user = users.find(user => user.email === email);
+
+            if (!user) return;
+
+            const newName = prompt("Ingrese el nuevo nombre:", user.name);
+            const newEmail = prompt("Ingrese el nuevo correo electrónico:", user.email);
+            const newPassword = prompt("Ingrese la nueva contraseña:", user.password);
+            const newRole = prompt(`Ingrese el nuevo rol (actual: ${user.role}) (admin/user):`, user.role).toLowerCase();
+
+            if (newName && newEmail && newPassword && (newRole === "admin" || newRole === "user")) {
+                user.name = newName;
+                user.email = newEmail;
+                user.password = newPassword;
+                user.role = newRole;
+
+                localStorage.setItem("users", JSON.stringify(users));
+                alert("Usuario actualizado correctamente.");
+                updateUserList();
+            } else {
+                alert("Edición cancelada. No se realizaron cambios.");
+            }
+        }
+
+        document.getElementById("logout").addEventListener("click", function () {
+            const loggedUser = JSON.parse(localStorage.getItem("loggedUser"));
+            
+            if (loggedUser) {
+                showMessage(`👋 Sesión cerrada correctamente... Hasta pronto, ${loggedUser.name}!!`, "success");
+                
+                setTimeout(() => {
+                    localStorage.removeItem("loggedUser"); 
+                    window.location.href = "index.html"; 
+                }, 2000);
+            }
+        });
+
+        function showMessage(message, type) {
+            const messageDiv = document.createElement("div");
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            document.getElementById("message-container").appendChild(messageDiv);
+
+            setTimeout(() => messageDiv.remove(), 3000);
+        }
+    </script>
+
+</body>
+</html>
