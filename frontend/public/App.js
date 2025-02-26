@@ -1,3 +1,12 @@
+const express = require('express');
+const app = express();
+const port = 3000; // Set the desired port
+ 
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const registrationForm = document.getElementById("registration-form");
