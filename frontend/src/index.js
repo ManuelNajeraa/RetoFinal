@@ -20,7 +20,7 @@ axios.interceptors.response.use(
   error => {
     if (error.response.status === 401 || error.response.status === 403) {
       // Redirigir a la página de inicio de sesión
-      window.location.href = '/login'; 
+      window.location.href = 'frontend/src/Web/admin-login.html'; 
     }
     return Promise.reject(error);
   }
