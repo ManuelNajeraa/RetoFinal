@@ -8,7 +8,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center; /* Centra verticalmente */
-    height: 75vh; /* Ocupa toda la altura de la ventana */
+    height: 100vh; /* Ocupa toda la altura de la ventana */
 }
 
 h1 {
@@ -24,7 +24,8 @@ form {
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    width: 350px; /* Ancho más estrecho para el formulario */
+    width: 90%; /* Ancho responsivo para el formulario */
+    max-width: 400px; /* Ancho máximo para el formulario */
     transition: box-shadow 0.3s; /* Transición suave para el efecto hover */
 }
 
@@ -81,7 +82,8 @@ button:hover {
     list-style-type: none;
     padding: 0;
     margin-top: 20px;
-    width: 350px; /* Ancho fijo para la lista */
+    width: 90%; /* Ancho responsivo para la lista */
+    max-width: 400px; /* Ancho máximo para la lista */
 }
 
 #user-list li {
@@ -97,11 +99,14 @@ button:hover {
     margin-top: 20px;
     display: flex;
     justify-content: space-between;
-    width: 350px; /* Ancho fijo para los botones */
+    width: 90%; /* Ancho responsivo para los botones */
+    max-width: 400px; /* Ancho máximo para los botones */
 }
 
 .login-buttons button {
     background-color: #28a745; /* Color verde para los botones de inicio de sesión */
+    flex: 1; /* Permite que los botones ocupen el mismo espacio */
+    margin: 0 5px; /* Espaciado entre los botones */
 }
 
 .login-buttons button:hover {
@@ -111,7 +116,8 @@ button:hover {
 /* Estilos de mensajes */
 #message-container {
     margin-top: 20px;
-    width: 350px; /* Ancho fijo para el contenedor de mensajes */
+    width: 90%; /* Ancho responsivo para el contenedor de mensajes */
+    max-width: 400px; /* Ancho máximo para el contenedor de mensajes */
 }
 
 .message {
@@ -130,4 +136,31 @@ button:hover {
 .message.error {
     background-color: #f8d7da;
     color: #721c24;
+}
+
+/* Media Queries para ajustar el diseño en pantallas más pequeñas */
+@media (max-width: 600px) {
+    body {
+        padding: 20px; /* Reduce el padding en pantallas pequeñas */
+    }
+
+    h1 {
+        font-size: 2rem; /* Reduce el tamaño de la fuente del encabezado */
+    }
+
+    form {
+        width: 95%; /* Aumenta el ancho en pantallas pequeñas */
+    }
+
+    #user-list {
+        width: 95%; /* Aumenta el ancho en pantallas pequeñas */
+    }
+
+    .login-buttons {
+        width: 95%; /* Aumenta el ancho en pantallas pequeñas */
+    }
+
+    #message-container {
+        width: 95%; /* Aumenta el ancho en pantallas pequeñas */
+    }
 }
