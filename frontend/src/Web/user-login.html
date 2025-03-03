@@ -24,17 +24,20 @@
   <script>
     document.getElementById("user-form").addEventListener("submit", function (event) {
       event.preventDefault();
-  
+
       const email = document.getElementById("user-email").value;
       const password = document.getElementById("user-password").value;
-  
+
       const users = JSON.parse(localStorage.getItem("users")) ;
       const user = users.find(user => user.email === email && user.password === password && user.role === "user");
-  
+
       if (user) {
         localStorage.setItem("loggedUser", JSON.stringify(user)); 
         showMessage(`✅ Inicio de sesión exitoso... Hola de nuevo, ${user.name}!`, "success");
-        setTimeout(() => window.location.href = "user-dashboard.html", 2000); 
+        setTimeout(() => {
+          // Redirigir a la URL de la API
+          window.location.href = 'https://www.figma.com/proto/0GvUxHGxMoPoSvxnLuKEYL/Untitled?node-id=49-444&p=f&t=bVzcoZwDNRYSCuKQ-0&scaling=min-zoom&content-scaling=fixed&page-id=49%3A414'; 
+        }, 2000);
       } else {
         showMessage("❌ Credenciales incorrectas o usuario no registrado.", "error");
       }
@@ -46,7 +49,7 @@
       messageDiv.textContent = message;
       messageDiv.className = `message ${type}`;
       document.getElementById("message-container").appendChild(messageDiv); 
-  
+
       setTimeout(() => messageDiv.remove(), 3000);
     }
   </script>

@@ -1,95 +1,169 @@
+// src/components/AdminDashboard.js
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
-document.addEventListener("DOMContentLoaded", function () {
-    const userList = document.getElementById("user-list");
-    const addUserForm = document.getElementById("add-user-form");
-    const logoutButton = document.getElementById("logout");
+function AdminDashboard() {
+  const [users, setUsers] = useState();
+  const [message, setMessage] = useState({ text: '', type: '' });
+  const navigate = useNavigate();
 
-    // Verificar si el usuario está autenticado como admin
+  useEffect(() => {
+    // Verificar autenticación al cargar el componente
     const isAuthenticated = checkAdminAuthentication();
     if (!isAuthenticated) {
-        window.location.href = "src/Web/admin-login.html"; // Redirigir si no está autenticado
+      navigate('/admin-login'); // Redirigir usando navigate
     }
 
     // Cargar la lista de usuarios
     loadUserList();
+  },);
 
-    // Agregar un nuevo usuario
-    addUserForm.addEventListener("submit", function (event) {
-        event.preventDefault();
+  const handleAddUser = async (event) => {
+    event.preventDefault();
 
-        const name = document.getElementById("new-name").value;
-        const email = document.getElementById("new-email").value;
-        const password = document.getElementById("new-password").value;
+    const name = document.getElementById("new-name").value;
+    const email = document.getElementById("new-email").value;
+    const password = document.getElementById("new-password").value;
+    const role = document.getElementById("new-role").value;
 
-        let users = JSON.parse(localStorage.getItem("users")) || [];
+    try {
+      await api.post('/api/users', { name, email, password, role });
+      showMessage('Usuario agregado correctamente.', 'success');
+      // Actualiza la lista de usuarios
+      loadUserList();
+      // Limpia el formulario
+      event.target.reset();
+    } catch (error) {
+      console.error('Error al agregar el usuario:', error);
+      showMessage('Error al agregar el usuario.', 'error');
+    }
+  };
 
-        // Verificar si el correo ya está registrado
-        if (users.some(user => user.email === email)) {
-            alert("Este correo ya está registrado.");
-            return;
-        }
+  const handleDeleteUser = async (id) => {
+    try {
+      await api.delete(`/api/users/${id}`);
+      showMessage('Usuario eliminado correctamente.', 'success');
+      loadUserList();
+    } catch (error) {
+      console.error('Error al eliminar el usuario:', error);
+      showMessage('Error al eliminar el usuario.', 'error');
+    }
+  };
 
-        // Agregar el nuevo usuario (por defecto es un usuario regular)
-        users.push({ name, email, password, role: "user" });
-        localStorage.setItem("users", JSON.stringify(users));
+  const handleEditUser = async (id) => {
+    const userToUpdate = users.find(user => user._id === id);
 
-        alert("Usuario agregado correctamente.");
-        loadUserList(); // Recargar la lista
-    });
-
-    // Función para cargar la lista de usuarios
-    function loadUserList() {
-        userList.innerHTML = ""; // Limpiar la lista antes de cargarla
-
-        let users = JSON.parse(localStorage.getItem("users")) || [];
-        users.forEach((user, index) => {
-            const li = document.createElement("li");
-            li.innerHTML = `
-                <strong>${user.name}</strong> - ${user.email}
-                <button onclick="editUser(${index})">Editar</button>
-                <button onclick="deleteUser(${index})">Eliminar</button>
-            `;
-            userList.appendChild(li);
-        });
+    if (!userToUpdate) {
+      showMessage('Usuario no encontrado.', 'error');
+      return;
     }
 
-    // Función para editar un usuario
-    window.editUser = function (index) {
-        const users = JSON.parse(localStorage.getItem("users"));
-        const user = users[index];
+    const newName = prompt("Ingrese el nuevo nombre:", userToUpdate.name);
+    const newEmail = prompt("Ingrese el nuevo correo electrónico:", userToUpdate.email);
+    const newPassword = prompt("Ingrese la nueva contraseña:", userToUpdate.password);
+    const newRole = prompt("Ingrese el nuevo rol (user/admin):", userToUpdate.role);
 
-        const newName = prompt("Nuevo nombre:", user.name);
-        const newEmail = prompt("Nuevo correo electrónico:", user.email);
-        const newPassword = prompt("Nueva contraseña:", user.password);
+    if (!newName || !newEmail || !newPassword || (newRole !== 'user' && newRole !== 'admin')) {
+      showMessage('Edición cancelada. Datos inválidos o faltantes.', 'error');
+      return;
+    }
 
-        if (newName && newEmail && newPassword) {
-            user.name = newName;
-            user.email = newEmail;
-            user.password = newPassword;
-            localStorage.setItem("users", JSON.stringify(users));
-            alert("Usuario actualizado correctamente.");
-            loadUserList(); // Recargar la lista
-        }
-    };
+    try {
+      await api.put(`/api/users/${id}`, {
+        name: newName,
+        email: newEmail,
+        password: newPassword,
+        role: newRole
+      });
+      showMessage('Usuario actualizado correctamente.', 'success');
+      loadUserList();
+    } catch (error) {
+      console.error('Error al actualizar el usuario:', error);
+      showMessage('Error al actualizar el usuario.', 'error');
+    }
+  };
 
-    // Función para eliminar un usuario
-    window.deleteUser = function (index) {
-        const users = JSON.parse(localStorage.getItem("users"));
-        users.splice(index, 1); // Eliminar el usuario por índice
-        localStorage.setItem("users", JSON.stringify(users));
-        alert("Usuario eliminado.");
-        loadUserList(); // Recargar la lista
-    };
+  const handleLogout = () => {
+    localStorage.removeItem("loggedUser");
+    navigate('/'); // Reemplaza '/' con la ruta de tu página de inicio de sesión
+  };
 
-    // Cerrar sesión
-    logoutButton.addEventListener("click", function () {
-        // Eliminar la información de autenticación (token o loggedUser) del localStorage
-        localStorage.removeItem("admin-email"); // O el token, o loggedUser
-        localStorage.removeItem("admin-password"); 
-    
-        window.location.href = "admin-login.html"; 
-    });
-});
+  const showMessage = (text, type) => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage({ text: '', type: '' }), 3000);
+  };
+
+  const loadUserList = async () => {
+    try {
+      const response = await api.get('/api/users');
+      setUsers(response.data.data); // Ajusta según la estructura de tu respuesta
+    } catch (error) {
+      console.error('Error al obtener los usuarios:', error);
+      showMessage('Error al obtener los usuarios', 'error');
+    }
+  };
+
+  return (
+    <div>
+      <h1>Panel de Administración</h1>
+
+      <h2>Agregar Nuevo Usuario</h2>
+      <form id="add-user-form" onSubmit={handleAddUser}>
+        <div>
+          <label htmlFor="new-name">Nombre:</label>
+          <input type="text" id="new-name" required />
+        </div>
+        <div>
+          <label htmlFor="new-email">Correo Electrónico:</label>
+          <input type="email" id="new-email" required />
+        </div>
+        <div>
+          <label htmlFor="new-password">Contraseña:</label>
+          <input type="password" id="new-password" required />
+        </div>
+        <div>
+          <label htmlFor="new-role">Rol:</label>
+          <select id="new-role">
+            <option value="user">Usuario Regular</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <button type="submit">Agregar Usuario</button>
+      </form>
+
+      <h2>Administrar Usuarios</h2>
+      <ul id="user-list">
+        {users.map(user => (
+          <li key={user._id}>
+            {user.name} - {user.email} ({user.role})
+            <button onClick={() => handleEditUser(user._id)} style={{ marginLeft: '10px' }}>
+              Editar
+            </button>
+            <button onClick={() => handleDeleteUser(user._id)} style={{ marginLeft: '10px' }}>
+              Eliminar
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <button id="logout" onClick={handleLogout}>
+        Cerrar Sesión
+      </button>
+
+      <div id="message-container">
+        {message.text && (
+          <div className={`message ${message.type}`}>
+            {message.text}
+          </div>
+        )}
+      </div>
+
+      <h2>Eliminar Cuenta</h2>
+      <button id="delete-account-btn">Eliminar mi cuenta</button>
+    </div>
+  );
+}
 
 // Función para verificar si el administrador está autenticado
 function checkAdminAuthentication() {
@@ -105,3 +179,5 @@ function checkAdminAuthentication() {
         return false; 
     }
 }
+
+export default AdminDashboard;

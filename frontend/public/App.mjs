@@ -1,11 +1,9 @@
-const express = require('express');
+import express from 'express';
 const app = express();
 const port = 3000; 
 
-<Route path="/user-login" element={<UserLogin />} />
-
 app.get('/', (req, res) => {
-  res.send('Buenas tardes')
+  res.send('Hola mundo')
 })
  
 

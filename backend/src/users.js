@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const usersController = require('../controllers/usersController');
+const usersController = require('./controllers/usersController');
 const authenticateToken = require('../middleware/authMiddleware');
 const authorizePermission = require('../middleware/authzMiddleware');
 
@@ -11,4 +11,4 @@ router.post('/', authenticateToken, authorizePermission('crear-usuario'), usersC
 router.put('/:id', authenticateToken, authorizePermission('editar-usuario'), usersController.updateUser);
 router.delete('/:id', authenticateToken, authorizePermission('eliminar-usuario'), usersController.deleteUser);
 
-module.exports = router;
+module.exports = router; 
