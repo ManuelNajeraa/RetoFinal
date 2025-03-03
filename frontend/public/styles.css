@@ -9,6 +9,7 @@ body {
 h1 {
     text-align: center;
     color: #333;
+    font-size: 2.5rem; /* Tamaño de fuente más grande */
 }
 
 h2 {
@@ -22,6 +23,10 @@ form {
     border-radius: 5px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+    width: 90%; /* Ancho responsivo */
+    max-width: 500px; /* Ancho máximo */
+    margin-left: auto; /* Centra el formulario */
+    margin-right: auto; /* Centra el formulario */
 }
 
 label {
@@ -38,6 +43,7 @@ select {
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
 }
 
 button {
@@ -48,6 +54,7 @@ button {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s;
+    width: 100%; /* Botón ocupa todo el ancho del formulario */
 }
 
 button:hover {
@@ -58,6 +65,10 @@ button:hover {
 #user-list {
     list-style-type: none;
     padding: 0;
+    width: 90%; /* Ancho responsivo */
+    max-width: 500px; /* Ancho máximo */
+    margin-left: auto; /* Centra la lista */
+    margin-right: auto; /* Centra la lista */
 }
 
 #user-list li {
@@ -84,6 +95,10 @@ button:hover {
     padding: 10px;
     margin: 10px 0;
     border-radius: 4px;
+    width: 90%; /* Ancho responsivo */
+    max-width: 500px; /* Ancho máximo */
+    margin-left: auto; /* Centra el mensaje */
+    margin-right: auto; /* Centra el mensaje */
 }
 
 .message.success {
@@ -100,9 +115,23 @@ button:hover {
 #logout,
 #delete-account-btn {
     background-color: #dc3545;
+    width: 100%; /* Botón ocupa todo el ancho */
 }
 
 #logout:hover,
 #delete-account-btn:hover {
     background-color: #c82333;
+}
+
+/* Media Queries para ajustar el diseño en pantallas más pequeñas */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem; /* Reduce el tamaño de la fuente del encabezado */
+    }
+
+    form,
+    #user-list,
+    .message {
+        width: 95%; /* Aumenta el ancho en pantallas pequeñas */
+    }
 }

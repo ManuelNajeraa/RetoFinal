@@ -1,0 +1,29 @@
+{
+  "name": "retofinal",
+  "version": "1.0.0",
+  "description": "-Este es nuestro proyecto final",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "nodemon ./frontend/public/App.js",
+    "start": "node ./frontend/public/App.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ManuelNajeraa/RetoFinal.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ManuelNajeraa/RetoFinal/issues"
+  },
+  "homepage": "https://github.com/ManuelNajeraa/RetoFinal#readme",
+  "dependencies": {
+    "axios": "^1.8.1",
+    "express": "^4.21.2",
+    "nodemon": "^3.1.9",
+    "react-router-dom": "^7.2.0"
+  }
+}
