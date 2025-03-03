@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../../src/models/User');
 
 // Obtiene todos los usuarios (con paginación y filtrado)
 exports.getUsers = async (req, res) => {

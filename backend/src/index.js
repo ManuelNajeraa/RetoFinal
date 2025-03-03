@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const mongoose = require('mongoose');
 const axios = require('axios'); // Importa axios para la API externa
-const usersRouter = require('./routes/users'); // Importa el enrutador de usuarios
+const usersRouter = require('backend/src/users.js'); // Importa el enrutador de usuarios
 
 
 // Conexión a MongoDB (corregida la URL)
@@ -73,6 +73,44 @@ function authorizePermission(permission) {
   };
 }
 
+// Ruta de Registro
+app.post('/api/users', async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+
+    // 1. Validación de datos
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ message: 'Faltan datos requeridos' });
+    }
+
+    // 2. Verificar si el usuario ya existe
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: 'El usuario ya existe' });
+    }
+
+    // 3. Hashear la contraseña (opcional, pero recomendado)
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 4. Crear el nuevo usuario
+    const newUser = new User({ name, email, password: hashedPassword, role });
+    await newUser.save();
+
+    // 5. Generar un token JWT (opcional)
+    const token = generateToken(newUser);
+
+    // 6. Enviar la respuesta
+    res.status(201).json({ 
+      message: 'Usuario creado correctamente', 
+      user: newUser, 
+      token: token  // Si generaste un token
+    });
+  } catch (error) {
+    console.error('Error al crear el usuario:', error);
+    res.status(500).json({ message: 'Error en el servidor' });
+  }
+});
+
 // Ruta de inicio de sesión
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
@@ -139,10 +177,10 @@ app.get('/api/profile', authenticateToken, authorizePermission('leer-datos-propi
   });
 });
 
-// Ruta para obtener datos de una API externa (ejemplo)
+// Ruta para obtener datos de una API externa 
 app.get('/api/external-data', authenticateToken, authorizePermission('leer-datos-api-externa'), async (req, res) => {
   try {
-    const response = await axios.get('https://rickandmortyapi.com/api/character'); // Ejemplo de API externa
+    const response = await axios.get('https://www.figma.com/design/0GvUxHGxMoPoSvxnLuKEYL/Untitled?node-id=0-1&t=Q5lHwH9uYEY1lPfj-1'); 
     res.json(response.data);
   } catch (error) {
     console.error('Error al obtener datos de la API externa:', error);
